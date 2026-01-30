@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import { AddItemInput } from '@/components/shopping/add-item-input';
+import { EditItemModal } from '@/components/shopping/edit-item-modal';
 import { EmptyState } from '@/components/shopping/empty-state';
 import { Header } from '@/components/shopping/header';
 import { ListItem } from '@/components/shopping/list-item';
@@ -16,6 +17,7 @@ export default function EditListScreen() {
   const [listId, setListId] = useState<string>('');
   const [listName, setListName] = useState<string>('Nova Lista');
   const flatListRef = useRef<FlatList>(null);
+  const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
 
   useEffect(() => {
     loadList();
@@ -75,6 +77,22 @@ export default function EditListScreen() {
         i.id === id ? { ...i, quantity: i.quantity - 1 } : i
       );
     });
+  };
+
+  const handleLongPress = (id: string) => {
+    const item = items.find(i => i.id === id);
+    if (item) {
+      setEditingItem(item);
+    }
+  };
+
+  const handleEditConfirm = (newName: string) => {
+    if (editingItem) {
+      setItems(items.map(item =>
+        item.id === editingItem.id ? { ...item, name: newName } : item
+      ));
+    }
+    setEditingItem(null);
   };
 
   const handleSaveList = async () => {
@@ -140,6 +158,7 @@ export default function EditListScreen() {
             item={item}
             onIncrease={handleIncrease}
             onDecrease={handleDecrease}
+            onLongPress={handleLongPress}
           />
         )}
         ListEmptyComponent={<EmptyState />}
@@ -147,6 +166,13 @@ export default function EditListScreen() {
       />
 
       <AddItemInput onAddItem={handleAddItem} />
+
+      <EditItemModal
+        visible={!!editingItem}
+        itemName={editingItem?.name || ''}
+        onClose={() => setEditingItem(null)}
+        onConfirm={handleEditConfirm}
+      />
     </KeyboardAvoidingView>
   );
 }

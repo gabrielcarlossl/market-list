@@ -5,14 +5,20 @@ interface ListItemProps {
   item: ShoppingItem;
   onIncrease: (id: string) => void;
   onDecrease: (id: string) => void;
+  onLongPress?: (id: string) => void;
 }
 
-export function ListItem({ item, onIncrease, onDecrease }: ListItemProps) {
+export function ListItem({ item, onIncrease, onDecrease, onLongPress }: ListItemProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.nameContainer}>
+      <TouchableOpacity 
+        style={styles.nameContainer}
+        onLongPress={() => onLongPress?.(item.id)}
+        activeOpacity={0.7}
+        delayLongPress={500}
+      >
         <Text style={styles.itemName}>{item.name}</Text>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.quantityContainer}>
         <TouchableOpacity 
