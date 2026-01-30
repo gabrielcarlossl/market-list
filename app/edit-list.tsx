@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import { AddItemInput } from '@/components/shopping/add-item-input';
@@ -15,6 +15,7 @@ export default function EditListScreen() {
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [listId, setListId] = useState<string>('');
   const [listName, setListName] = useState<string>('Nova Lista');
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     loadList();
@@ -48,6 +49,11 @@ export default function EditListScreen() {
       quantity: 1,
     };
     setItems([...items, newItem]);
+    
+    // Scroll to the end after adding item
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
   const handleIncrease = (id: string) => {
@@ -126,6 +132,7 @@ export default function EditListScreen() {
       />
       
       <FlatList
+        ref={flatListRef}
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
