@@ -7,6 +7,7 @@ import { EditItemModal } from '@/components/shopping/edit-item-modal';
 import { EmptyState } from '@/components/shopping/empty-state';
 import { Header } from '@/components/shopping/header';
 import { ListItem } from '@/components/shopping/list-item';
+import { RenameListModal } from '@/components/shopping/rename-list-modal';
 import { storageService } from '@/services/storage';
 import { ShoppingItem, ShoppingList } from '@/types/shopping-list';
 
@@ -18,6 +19,8 @@ export default function EditListScreen() {
   const [listName, setListName] = useState<string>('Nova Lista');
   const flatListRef = useRef<FlatList>(null);
   const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     loadList();
@@ -35,6 +38,7 @@ export default function EditListScreen() {
         setItems(existingList.items);
         setListId(existingList.id);
         setListName(existingList.name);
+        setIsSaved(true);
       }
     } else {
       // Creating new list
@@ -51,6 +55,7 @@ export default function EditListScreen() {
       quantity,
     };
     setItems([...items, newItem]);
+    setIsSaved(false);
     
     // Scroll to the end after adding item
     setTimeout(() => {
@@ -62,6 +67,7 @@ export default function EditListScreen() {
     setItems(items.map(item =>
       item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     ));
+    setIsSaved(false);
   };
 
   const handleDecrease = (id: string) => {
@@ -77,12 +83,14 @@ export default function EditListScreen() {
         i.id === id ? { ...i, quantity: i.quantity - 1 } : i
       );
     });
+    setIsSaved(false);
   };
 
   const handleToggleCheck = (id: string) => {
     setItems(items.map(item =>
       item.id === id ? { ...item, checked: !item.checked } : item
     ));
+    setIsSaved(false);
   };
 
   const handleLongPress = (id: string) => {
@@ -97,6 +105,7 @@ export default function EditListScreen() {
       setItems(items.map(item =>
         item.id === editingItem.id ? { ...item, name: newName } : item
       ));
+      setIsSaved(false);
     }
     setEditingItem(null);
   };
@@ -117,19 +126,15 @@ export default function EditListScreen() {
     
     try {
       await storageService.saveList(list);
-      Alert.alert('Sucesso', 'Lista salva com sucesso!', [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        }
-      ]);
+      setIsSaved(true);
+      Alert.alert('Salvo!', 'Lista salva com sucesso.');
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar a lista.');
     }
   };
 
   const handleBack = () => {
-    if (items.length > 0) {
+    if (!isSaved && items.length > 0) {
       Alert.alert(
         'Descartar alterações?',
         'Você tem itens não salvos. Deseja descartar?',
@@ -153,6 +158,7 @@ export default function EditListScreen() {
         title={listName}
         onMenuPress={handleBack}
         onSavePress={handleSaveList}
+        onTitlePress={() => setShowRenameModal(true)}
       />
       
       <FlatList
@@ -179,6 +185,17 @@ export default function EditListScreen() {
         itemName={editingItem?.name || ''}
         onClose={() => setEditingItem(null)}
         onConfirm={handleEditConfirm}
+      />
+
+      <RenameListModal
+        visible={showRenameModal}
+        currentName={listName}
+        onClose={() => setShowRenameModal(false)}
+        onConfirm={(newName) => {
+          setListName(newName);
+          setIsSaved(false);
+          setShowRenameModal(false);
+        }}
       />
     </KeyboardAvoidingView>
   );
