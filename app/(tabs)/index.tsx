@@ -4,6 +4,7 @@ import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CreateListModal } from '@/components/shopping/create-list-modal';
+import { RenameListModal } from '@/components/shopping/rename-list-modal';
 import { storageService } from '@/services/storage';
 import { ShoppingList } from '@/types/shopping-list';
 
@@ -11,6 +12,10 @@ export default function HomeScreen() {
   const router = useRouter();
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [renameModal, setRenameModal] = useState<{ visible: boolean; list: ShoppingList | null }>({
+    visible: false,
+    list: null,
+  });
 
   useEffect(() => {
     loadLists();
@@ -50,6 +55,22 @@ export default function HomeScreen() {
         listName: list.name,
       },
     });
+  };
+
+  const handleLongPressName = (list: ShoppingList) => {
+    setRenameModal({ visible: true, list });
+  };
+
+  const handleConfirmRename = async (newName: string) => {
+    if (!renameModal.list) return;
+    const updated: ShoppingList = {
+      ...renameModal.list,
+      name: newName,
+      updatedAt: new Date().toISOString(),
+    };
+    await storageService.saveList(updated);
+    setRenameModal({ visible: false, list: null });
+    loadLists();
   };
 
   const handleDeleteList = (listId: string, listName: string) => {
@@ -92,7 +113,13 @@ export default function HomeScreen() {
       activeOpacity={0.7}
     >
       <View style={styles.listHeader}>
-        <Text style={styles.listName}>{item.name}</Text>
+        <TouchableOpacity
+          onLongPress={() => handleLongPressName(item)}
+          delayLongPress={500}
+          activeOpacity={1}
+        >
+          <Text style={styles.listName}>{item.name}</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={(e) => {
             e.stopPropagation();
@@ -171,6 +198,13 @@ export default function HomeScreen() {
         visible={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onConfirm={handleConfirmCreate}
+      />
+
+      <RenameListModal
+        visible={renameModal.visible}
+        currentName={renameModal.list?.name ?? ''}
+        onClose={() => setRenameModal({ visible: false, list: null })}
+        onConfirm={handleConfirmRename}
       />
     </View>
   );

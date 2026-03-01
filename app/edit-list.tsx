@@ -44,11 +44,11 @@ export default function EditListScreen() {
     }
   };
 
-  const handleAddItem = (itemName: string) => {
+  const handleAddItem = (itemName: string, quantity: number = 1) => {
     const newItem: ShoppingItem = {
       id: Date.now().toString(),
       name: itemName,
-      quantity: 1,
+      quantity,
     };
     setItems([...items, newItem]);
     
@@ -77,6 +77,12 @@ export default function EditListScreen() {
         i.id === id ? { ...i, quantity: i.quantity - 1 } : i
       );
     });
+  };
+
+  const handleToggleCheck = (id: string) => {
+    setItems(items.map(item =>
+      item.id === id ? { ...item, checked: !item.checked } : item
+    ));
   };
 
   const handleLongPress = (id: string) => {
@@ -159,6 +165,7 @@ export default function EditListScreen() {
             onIncrease={handleIncrease}
             onDecrease={handleDecrease}
             onLongPress={handleLongPress}
+            onToggleCheck={handleToggleCheck}
           />
         )}
         ListEmptyComponent={<EmptyState />}

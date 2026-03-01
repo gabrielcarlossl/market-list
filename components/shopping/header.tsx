@@ -17,10 +17,9 @@ export function Header({ title, onMenuPress, onSavePress, showSaveButton = true 
           onPress={onMenuPress}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <View style={styles.menuIcon}>
-            <View style={styles.menuLine} />
-            <View style={styles.menuLine} />
-            <View style={styles.menuLine} />
+          <View style={styles.arrowIcon}>
+            <View style={[styles.arrowLine, styles.arrowLineTop]} />
+            <View style={[styles.arrowLine, styles.arrowLineBottom]} />
           </View>
         </TouchableOpacity>
 
@@ -33,7 +32,9 @@ export function Header({ title, onMenuPress, onSavePress, showSaveButton = true 
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <View style={styles.disketteIcon}>
-              <View style={styles.disketteTop} />
+              <View style={styles.disketteShutter}>
+                <View style={styles.disketteWindow} />
+              </View>
               <View style={styles.disketteLabel} />
             </View>
           </TouchableOpacity>
@@ -64,16 +65,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuIcon: {
+  arrowIcon: {
     width: 24,
-    height: 18,
-    justifyContent: 'space-between',
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  menuLine: {
-    width: '100%',
-    height: 3,
+  arrowLine: {
+    position: 'absolute',
+    width: 14,
+    height: 2.5,
     backgroundColor: '#000',
     borderRadius: 2,
+  },
+  arrowLineTop: {
+    transform: [{ rotate: '-45deg' }, { translateY: -5 }],
+  },
+  arrowLineBottom: {
+    transform: [{ rotate: '45deg' }, { translateY: 5 }],
   },
   title: {
     fontSize: 20,
@@ -83,28 +92,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   disketteIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     borderWidth: 2,
     borderColor: '#000',
-    borderRadius: 2,
+    borderRadius: 3,
     backgroundColor: '#fff',
-    position: 'relative',
+    overflow: 'hidden',
   },
-  disketteTop: {
+  disketteShutter: {
     width: '100%',
-    height: 8,
+    height: 9,
     backgroundColor: '#000',
-    borderTopLeftRadius: 1,
-    borderTopRightRadius: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 3,
+  },
+  disketteWindow: {
+    width: 6,
+    height: 5,
+    backgroundColor: '#888',
+    borderRadius: 1,
   },
   disketteLabel: {
     position: 'absolute',
-    bottom: 3,
+    bottom: 2,
     left: 3,
     right: 3,
-    height: 3,
-    backgroundColor: '#000',
+    height: 7,
+    backgroundColor: '#ddd',
     borderRadius: 1,
+    borderWidth: 1,
+    borderColor: '#aaa',
   },
 });

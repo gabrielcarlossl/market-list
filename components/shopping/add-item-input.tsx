@@ -3,17 +3,27 @@ import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableO
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface AddItemInputProps {
-  onAddItem: (itemName: string) => void;
+  onAddItem: (itemName: string, quantity: number) => void;
 }
 
 export function AddItemInput({ onAddItem }: AddItemInputProps) {
   const [text, setText] = useState('');
+  const [quantity, setQuantity] = useState(1);
 
   const handleAdd = () => {
     if (text.trim()) {
-      onAddItem(text.trim());
+      onAddItem(text.trim(), quantity);
       setText('');
+      setQuantity(1);
     }
+  };
+
+  const handleDecrease = () => {
+    if (quantity > 1) setQuantity(q => q - 1);
+  };
+
+  const handleIncrease = () => {
+    setQuantity(q => q + 1);
   };
 
   return (
@@ -32,8 +42,26 @@ export function AddItemInput({ onAddItem }: AddItemInputProps) {
             onSubmitEditing={handleAdd}
             returnKeyType="done"
           />
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.qtyButton}
+              onPress={handleDecrease}
+              disabled={quantity <= 1}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={[styles.qtyButtonText, quantity <= 1 && styles.qtyButtonDisabled]}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.qtyValue}>{quantity}</Text>
+            <TouchableOpacity
+              style={styles.qtyButton}
+              onPress={handleIncrease}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.qtyButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity 
-            style={styles.addButton}
+            style={[styles.addButton, !text.trim() && styles.addButtonDisabled]}
             onPress={handleAdd}
             disabled={!text.trim()}
           >
@@ -68,6 +96,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#fff',
   },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+  },
+  qtyButton: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qtyButtonText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
+    lineHeight: 22,
+  },
+  qtyButtonDisabled: {
+    color: '#ccc',
+  },
+  qtyValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    minWidth: 20,
+    textAlign: 'center',
+  },
   addButton: {
     width: 48,
     height: 48,
@@ -75,6 +136,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  addButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   addButtonText: {
     fontSize: 28,
