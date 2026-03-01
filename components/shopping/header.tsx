@@ -5,10 +5,11 @@ interface HeaderProps {
   title: string;
   onMenuPress?: () => void;
   onSavePress?: () => void;
+  onTitlePress?: () => void;
   showSaveButton?: boolean;
 }
 
-export function Header({ title, onMenuPress, onSavePress, showSaveButton = true }: HeaderProps) {
+export function Header({ title, onMenuPress, onSavePress, onTitlePress, showSaveButton = true }: HeaderProps) {
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.container}>
@@ -23,7 +24,13 @@ export function Header({ title, onMenuPress, onSavePress, showSaveButton = true 
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity
+          onPress={onTitlePress}
+          disabled={!onTitlePress}
+          activeOpacity={onTitlePress ? 0.6 : 1}
+        >
+          <Text style={styles.title}>{title}</Text>
+        </TouchableOpacity>
 
         {showSaveButton ? (
           <TouchableOpacity 
