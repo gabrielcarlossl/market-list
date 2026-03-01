@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -127,7 +128,7 @@ export default function HomeScreen() {
           }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.deleteButton}>🗑️</Text>
+          <Ionicons name="trash-outline" size={20} color="#888" />
         </TouchableOpacity>
       </View>
       
@@ -257,9 +258,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
     flex: 1,
-  },
-  deleteButton: {
-    fontSize: 20,
   },
   listDate: {
     fontSize: 14,
